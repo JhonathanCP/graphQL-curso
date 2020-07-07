@@ -1,0 +1,5 @@
+->CREAR PACKAGE.JSON
+npm init -y 
+->GIT
+git init
+crear gitignore
