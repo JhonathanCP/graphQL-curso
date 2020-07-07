@@ -8,8 +8,8 @@
     "transpile": "babel ./src --out-dir dist --copy-files",
     "build": "npm-run-all clean transpile",
     "server": "node ./dist/main.js",
-    "prod": "NODE_ENV=production npm-run-all build server",
-    "dev": "NODE_ENV=development npm-run-all build server",
+    "prod": "set NODE_ENV=production && npm-run-all build server",
+    "dev": "set NODE_ENV=development && npm-run-all build server",
     "watch:dev": "nodemon",
     "start": "npm run prod"
   },
@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cross-env": "^7.0.2",
     "graphql-yoga": "^1.18.3"
   },
   "devDependencies": {
