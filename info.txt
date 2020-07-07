@@ -3,3 +3,26 @@ npm init -y
 ->GIT
 git init
 crear gitignore
+pushear al repositorio
+->INSTALAR DEPENDENCIAS
+npm i -S graphql-yoga
+npm i -D @babel/core @babel/cli @babel/preset-env
+->CONFIGURAR BABEL
+crear .babelrc y config
+{
+    "presets": ["@babel/preset-env"]
+}
+->AGREGAR NODEMON
+npm i -D nodemon
+crear nodemon.json y config
+{
+    "exec": "npm run dev",
+    "watch": ["src/**"],
+    "ext": "js, graphql" 
+}
+->INSTALAR HERRAMIENTAS
+npm i -D rimraf
+npm i -D npm-run-all
+->CONFIGURAR PACKAGE.JSON
+borrar script
+agregar
