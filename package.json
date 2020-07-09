@@ -18,7 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "cross-env": "^7.0.2",
-    "graphql-yoga": "^1.18.3"
+    "graphql-yoga": "^1.18.3",
+    "uuid": "^8.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",

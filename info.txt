@@ -29,3 +29,7 @@ borrar script
 agregar
 ->INICIAR graphql
 crear src y main.js
+crear schema.graphql
+deployar con npm run watch:dev
+->GENERADOR DE ID
+npm i -S uuid
