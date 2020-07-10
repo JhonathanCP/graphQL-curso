@@ -36,3 +36,7 @@ npm i -S uuid
 ->AGREGAR SUBSCRIPTION
 agregar PubSub al ctx
 crear Subscription.js en el resolver
+->BD
+instalar postgre
+instalar docker
+instalar dbeaver
