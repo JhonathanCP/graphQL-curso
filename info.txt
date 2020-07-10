@@ -37,6 +37,9 @@ npm i -S uuid
 agregar PubSub al ctx
 crear Subscription.js en el resolver
 ->BD
-instalar postgre
+instalar postgres
 instalar docker
 instalar dbeaver
+en docker 
+docker pull postgres
+crear contenedor: docker run --name jcbookstore -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
