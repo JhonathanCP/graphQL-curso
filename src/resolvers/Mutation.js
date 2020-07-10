@@ -33,7 +33,7 @@ const Mutations = {
         })
         return {...userExist, ...data}
     },
-    createAuthor: (parent,{data},{db},info)=>{
+    createAuthor: (parent,{data},{db, pubsub},info)=>{
         const author = {
             id: uuidv4(),
             ...data
@@ -41,9 +41,16 @@ const Mutations = {
 
         db.authors.push(author)
 
+        /* Subscription agregado */
+        pubsub.publish('author',{
+            author: {
+                mutation: 'CREATED',
+                data: author
+            }
+        })
         return author
     },
-    updateAuthor: (parent,{id, data},{db},info)=>{
+    updateAuthor: (parent,{id, data},{db, pubsub},info)=>{
         const authorExist = db.authors.find(author=>author.id === id)
         if(!authorExist){
             throw new Error('Author not found')
@@ -56,9 +63,26 @@ const Mutations = {
             }
             return author
         })
-        return {...authorExist, ...data}
+        
+        const authorUpdated = {...authorExist, ...data}
+
+        /* Subscription agregado */
+        pubsub.publish('author',{
+            author: {
+                mutation: 'UPDATED',
+                data: authorUpdated
+            }
+        })
+
+        return authorUpdated
     },
-    createBook: (parent,{data},{db},info)=>{
+    createBook: (parent,{data},{db,pubsub},info)=>{
+        const authorExists = db.authors.some(author => author.id === data.writted_by)
+
+        if(!authorExists) {
+            throw new Error('Author does not exits')
+        }
+
         const book = {
             id: uuidv4(),
             ...data
@@ -66,9 +90,24 @@ const Mutations = {
 
         db.books.push(book)
 
+        /* Subscription agregado */
+        pubsub.publish(`book - ${book.writted_by}`,{
+            book: {
+                mutation: 'CREATED',
+                data: book
+            }
+        })
+
         return book
     },
-    updateBook: (parent,{id,data},{db},info)=>{
+    updateBook: (parent,{id,data},{db, pubsub},info)=>{
+
+        const authorExists = db.authors.some(author => author.id === data.writted_by)
+
+        if(data.writted_by && !authorExists) {
+            throw new Error('Author does not exits')
+        }
+
         const bookExist = db.books.find(book=>book.id === id)
         if(!bookExist){
             throw new Error('Book not found')
@@ -81,9 +120,20 @@ const Mutations = {
             }
             return book
         })
-        return {...bookExist, ...data}
+
+        const bookUpdated = {...bookExist, ...data}
+
+        /* Subscription agregado */
+        pubsub.publish(`book - ${bookUpdated.writted_by}`,{
+            book: {
+                mutation: 'UPDATED',
+                data: bookUpdated
+            }
+        })
+
+        return bookUpdated
     },
-    deleteBook: (parent,{id},{db},info)=>{
+    deleteBook: (parent,{id},{db, pubsub},info)=>{
         const bookExist = db.books.find(book=>book.id === id)
         if(!bookExist){
             throw new Error('Book not found')
@@ -95,6 +145,14 @@ const Mutations = {
             }
             return acc
         }, [])
+
+        /* Subscription agregado */
+        pubsub.publish(`book - ${bookExist.writted_by}`,{
+            book: {
+                mutation: 'DELETED',
+                data: bookExist
+            }
+        })
 
         return bookExist
     },

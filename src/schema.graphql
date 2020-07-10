@@ -1,3 +1,4 @@
+#TODO: Resolvers
 type Query {
     hello(name: String): String!
     quantity: Int!
@@ -31,6 +32,7 @@ type Book {
     register_by: User!
 }
 
+#TODO: Mutations
 type Mutation {
     createUser(data: createUserInput): User!
     updateUser(
@@ -49,6 +51,31 @@ type Mutation {
     ): Book!
     deleteBook(id: ID!): Book!
 }
+
+#TODO: Subscripciones
+type Subscription {
+    count: Int!
+    author: AuthorSubscriptionPayload!
+    book(authorId: ID!): BookSubscriptionPayload!
+}
+
+enum MutationType {#Opciones únicas disponibles
+    CREATED
+    UPDATED
+    DELETED
+}
+
+type AuthorSubscriptionPayload {
+    mutation: MutationType!
+    data: Author!
+}
+
+type BookSubscriptionPayload {
+    mutation: MutationType!
+    data: Book!
+}
+
+#TODO: Input data
 
 input createUserInput {
     name: String!

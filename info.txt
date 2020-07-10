@@ -33,3 +33,6 @@ crear schema.graphql
 deployar con npm run watch:dev
 ->GENERADOR DE ID
 npm i -S uuid
+->AGREGAR SUBSCRIPTION
+agregar PubSub al ctx
+crear Subscription.js en el resolver
