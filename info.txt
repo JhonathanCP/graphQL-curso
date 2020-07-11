@@ -43,3 +43,9 @@ instalar dbeaver
 en docker 
 docker pull postgres
 crear contenedor: docker run --name jcbookstore -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+crear bd y el script
+instalar prisma npm i -D @prisma/cli
+instalar npx prisma2 init
+configurar el.env
+inspeccionar la bd con npx prisma2 introspect
+se actualizará schema.prisma borrando campos no obligatorios "?"
