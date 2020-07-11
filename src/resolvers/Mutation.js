@@ -1,7 +1,6 @@
-import { v4 as uuidv4} from 'uuid'
 const Mutations = {
-    createUser: (parent,{data},{db},info)=>{
-        const isEmailTaken = db.users.some(user => user.email === data.email)
+    createUser: (parent,{data},{prisma},info)=>{
+        /* const isEmailTaken = db.users.some(user => user.email === data.email)
         if(isEmailTaken){
             throw new Error('Email Taken')
         }
@@ -12,10 +11,13 @@ const Mutations = {
 
         db.users.push(user)
 
-        return user
+        return user */
+        return prisma.users.create({
+            data,
+        })
     },
-    updateUser: (parent,{id, data},{db},info)=>{
-        const userExist = db.users.find(user=>user.id === id)
+    updateUser: (parent,{id, data},{prisma},info)=>{
+        /* const userExist = db.users.find(user=>user.id === id)
         if(!userExist){
             throw new Error('User not found')
         }
@@ -31,27 +33,38 @@ const Mutations = {
             }
             return user
         })
-        return {...userExist, ...data}
+        return {...userExist, ...data} */
+        return prisma.users.update({
+            where: {id},
+            data,
+        })
     },
-    createAuthor: (parent,{data},{db, pubsub},info)=>{
-        const author = {
+    createAuthor: async (parent,{data},{prisma, pubsub},info)=>{
+        /* const author = {
             id: uuidv4(),
             ...data
         }
 
-        db.authors.push(author)
-
+        db.authors.push(author) */
+        const {register_by, ...rest} = data
+        const newAuthor = await prisma.authors.create({
+            data: {...rest, users:{
+                connect:{
+                    id: Number(register_by)
+                }
+            }}
+        })
         /* Subscription agregado */
         pubsub.publish('author',{
             author: {
                 mutation: 'CREATED',
-                data: author
+                data: newAuthor
             }
         })
-        return author
+        return newAuthor
     },
-    updateAuthor: (parent,{id, data},{db, pubsub},info)=>{
-        const authorExist = db.authors.find(author=>author.id === id)
+    updateAuthor: async (parent,{id, data},{prisma, pubsub},info)=>{
+        /* const authorExist = db.authors.find(author=>author.id === id)
         if(!authorExist){
             throw new Error('Author not found')
         }
@@ -64,8 +77,21 @@ const Mutations = {
             return author
         })
         
-        const authorUpdated = {...authorExist, ...data}
-
+        const authorUpdated = {...authorExist, ...data} */
+        const {register_by} = data
+        if(register_by){
+            data.users={
+                connect:{
+                    id: Number(register_by)
+                }
+            }
+        }
+        const authorUpdated = await prisma.authors.update({
+            where: {
+                id: Number(id)
+            },
+            data
+        })
         /* Subscription agregado */
         pubsub.publish('author',{
             author: {
@@ -76,8 +102,8 @@ const Mutations = {
 
         return authorUpdated
     },
-    createBook: (parent,{data},{db,pubsub},info)=>{
-        const authorExists = db.authors.some(author => author.id === data.writted_by)
+    createBook: async (parent,{data},{prisma,pubsub},info)=>{
+        /* const authorExists = db.authors.some(author => author.id === data.writted_by)
 
         if(!authorExists) {
             throw new Error('Author does not exits')
@@ -88,21 +114,32 @@ const Mutations = {
             ...data
         }
 
-        db.books.push(book)
-
+        db.books.push(book) */
+        const {writted_by,register_by,...rest} = data
+        const newBook = await prisma.books.create({
+            data: {
+                ...rest,
+                authors: {
+                    connect: Number(writted_by)
+                },
+                users: {
+                    connect: Number(register_by)
+                },
+            }
+        })
         /* Subscription agregado */
-        pubsub.publish(`book - ${book.writted_by}`,{
+        pubsub.publish(`book - ${newBook.writted_by}`,{
             book: {
                 mutation: 'CREATED',
-                data: book
+                data: newBook
             }
         })
 
-        return book
+        return newBook
     },
-    updateBook: (parent,{id,data},{db, pubsub},info)=>{
+    updateBook: async (parent,{id,data},{prisma, pubsub},info)=>{
 
-        const authorExists = db.authors.some(author => author.id === data.writted_by)
+        /* const authorExists = db.authors.some(author => author.id === data.writted_by)
 
         if(data.writted_by && !authorExists) {
             throw new Error('Author does not exits')
@@ -121,8 +158,28 @@ const Mutations = {
             return book
         })
 
-        const bookUpdated = {...bookExist, ...data}
-
+        const bookUpdated = {...bookExist, ...data} */
+        const {writted_by, register_by} = data
+        if(writted_by){
+            data.authors={
+                connect: {
+                    id: Number(writted_by)
+                }
+            }
+        }
+        if(register_by){
+            data.users={
+                connect: {
+                    id: Number(register_by)
+                }
+            }
+        }
+        const bookUpdated = prisma.books.update({
+            where: {
+                id: Number(id)
+            },
+            data
+        })
         /* Subscription agregado */
         pubsub.publish(`book - ${bookUpdated.writted_by}`,{
             book: {
@@ -133,8 +190,8 @@ const Mutations = {
 
         return bookUpdated
     },
-    deleteBook: (parent,{id},{db, pubsub},info)=>{
-        const bookExist = db.books.find(book=>book.id === id)
+    deleteBook: async (parent,{id},{prisma, pubsub},info)=>{
+        /* const bookExist = db.books.find(book=>book.id === id)
         if(!bookExist){
             throw new Error('Book not found')
         }
@@ -144,17 +201,21 @@ const Mutations = {
                 acc.push(book)
             }
             return acc
-        }, [])
-
+        }, []) */
+        const bookDeleted = prisma.books.delete({
+            where: {
+                id: Number(id)
+            }
+        })
         /* Subscription agregado */
-        pubsub.publish(`book - ${bookExist.writted_by}`,{
+        pubsub.publish(`book - ${bookDeleted.writted_by}`,{
             book: {
                 mutation: 'DELETED',
-                data: bookExist
+                data: bookDeleted
             }
         })
 
-        return bookExist
+        return bookDeleted
     },
 }
 

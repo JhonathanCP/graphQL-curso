@@ -1,4 +1,5 @@
 import { GraphQLServer, PubSub } from 'graphql-yoga'
+import { PrismaClient } from '@prisma/client'/* Agregando prisma */
 
 import Query from './resolvers/Query'
 import Author from './resolvers/Author'
@@ -8,6 +9,7 @@ import Subscription from './resolvers/Subscription'
 import db from './db'
 
 const pubsub = new PubSub()
+const prisma = new PrismaClient()/* Instanciando prisma */
 
 const resolvers = {
     Query,
@@ -19,7 +21,8 @@ const resolvers = {
 
 const context = {
     db,
-    pubsub /* Subscription */
+    pubsub,/* Subscription */
+    prisma,/* Conexión a db */
 }
 
 const server = new GraphQLServer({

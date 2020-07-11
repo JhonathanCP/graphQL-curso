@@ -49,3 +49,22 @@ instalar npx prisma2 init
 configurar el.env
 inspeccionar la bd con npx prisma2 introspect
 se actualizará schema.prisma borrando campos no obligatorios "?"
+instalar Prisma client npm i -S @prisma/client
+conectar con la bd npx prisma2 generate
+agregar prisma al ctx en main.js
+configurar queries, mutations y Subscriptions(en mutations)
+configurar cada type en sus resolvers
+conectar con la bd npx prisma2 introspect  y npx prisma2 generate para los cambios
+instalar puglin de babel para el async npm i -D @babel/plugin-transform-runtime
+agregar dependencia a babel
+{
+    "presets": ["@babel/preset-env"],
+    "plugins": [
+        [
+            "@babel/plugin-transform-runtime",
+            {
+                "regenerator": true
+            }
+        ]
+    ]
+}
