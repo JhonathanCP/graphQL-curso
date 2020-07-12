@@ -34,7 +34,8 @@ type Book {
 
 #TODO: Mutations
 type Mutation {
-    createUser(data: createUserInput): User!
+    signUp(data: signUpInput!): AuthPayload!
+    login(data: loginInput!): AuthPayload!
     updateUser(
         id: ID!
         data: updateUserInput
@@ -65,6 +66,11 @@ enum MutationType {#Opciones únicas disponibles
     DELETED
 }
 
+type AuthPayload {
+    user: User!
+    token: String!
+}
+
 type AuthorSubscriptionPayload {
     mutation: MutationType!
     data: Author!
@@ -77,18 +83,23 @@ type BookSubscriptionPayload {
 
 #TODO: Input data
 
-input createUserInput {
+input signUpInput {
     name: String!
     lastname: String!
     email: String!
-    #password: String!
+    password: String!
+}
+
+input loginInput {
+    email: String!
+    password: String!
 }
 
 input updateUserInput {
     name: String
     lastname: String
     email: String
-    #password: String
+    password: String
 }
 
 input createAuthorInput {

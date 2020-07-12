@@ -1,3 +1,4 @@
+import { getUserId } from '../utils'
 const Query = {
     /* hello (parent, args, ctx, info) {
         return 'Hello world'
@@ -8,8 +9,8 @@ const Query = {
         return `Hello ${name||'world'}`
     },
     quantity: () => 1,
-    user: (parent, {id}, {prisma}, info) => {/* prisma agregado */
-
+    user: (parent, {id}, {request,prisma}, info) => {/* prisma agregado */
+        const userId = getUserId(request)
         if(!id){
             return prisma.users.findMany()
         }
@@ -20,8 +21,8 @@ const Query = {
             }
         })
     },
-    author: (parent, {id}, {prisma}, info) => {/* prisma agregado */
-
+    author: (parent, {id}, {request,prisma}, info) => {/* prisma agregado */
+        const userId = getUserId(request)
         if(!id){
             return prisma.authors.findMany()
         }
@@ -32,8 +33,8 @@ const Query = {
             }
         })
     },
-    book: (parent, {id}, {prisma}, info) => {/* prisma agregado */
-
+    book: (parent, {id}, {request,prisma}, info) => {/* prisma agregado */
+        const userId = getUserId(request)
         if(!id){
             return prisma.books.findMany()
         }

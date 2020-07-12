@@ -68,3 +68,43 @@ agregar dependencia a babel
         ]
     ]
 }
+->AUTHENTICATION
+agregar token generator y encriptador npm i -S jsonwebtoken bcrypt
+agregar columna password a los users
+informar los cambios a prisma2
+npx prisma2 introspect
+npx prisma2 generate
+agregar carpeta utils
+y su index.js y configurarlo
+import jsw from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+
+const SECRET = 'jc'
+
+export const getUserId = () => {
+    return  'Hellow world'
+}
+
+export const hashPassword = async password =>{/* hash de contraseña */
+    if(password.lenght<6){
+        throw new Error('Password must be have at least 6 characters')
+    }
+    const salt = await bcrypt.genSalt(10)
+    return bcrypt.hash(password, salt)
+}
+
+export const validatePassword = async (requestPassword, password) => {/* validación */
+    return await bcrypt.compare(requestPassword,password)
+}
+
+export const generateToken = (userId) => {
+    return jsw.sign({userId},SECRET,{ expiresIn:'3 days'})
+}
+
+ir a main.js
+configurar ctx
+ir al schema y configurar con el password
+agregar cambios al mutation.js
+cambiar signUp
+agregar login al schema y al mutations
+agregar validación a los queries y en los demás resolvers

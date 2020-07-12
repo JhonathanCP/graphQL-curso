@@ -1,5 +1,7 @@
+import {generateToken, hashPassword, validatePassword, getUserId} from '../utils/'
+
 const Mutations = {
-    createUser: (parent,{data},{prisma},info)=>{
+    signUp: async (parent,{data},{prisma},info)=>{/* authentication added */
         /* const isEmailTaken = db.users.some(user => user.email === data.email)
         if(isEmailTaken){
             throw new Error('Email Taken')
@@ -12,11 +14,35 @@ const Mutations = {
         db.users.push(user)
 
         return user */
-        return prisma.users.create({
-            data,
+        const password = await hashPassword(data.password)
+        const user = await prisma.users.create({
+            data: {
+                ...data,
+                password
+            }
         })
+        return {
+            user,
+            token: generateToken(user.id)
+        }
     },
-    updateUser: (parent,{id, data},{prisma},info)=>{
+    login: async(parent,{data},{prisma},info)=>{
+        const user = await prisma.users.findOne({
+            where: {
+                email: data.email,
+
+            }
+        })
+        const isValid = await validatePassword(data.password,user.password)
+        if(!isValid) {
+            throw new Error('Password incorrect')
+        }
+        return {
+            user,
+            token: generateToken(user.id)
+        }
+    },
+    updateUser: async (parent,{id, data},{request,prisma},info)=>{
         /* const userExist = db.users.find(user=>user.id === id)
         if(!userExist){
             throw new Error('User not found')
@@ -34,18 +60,24 @@ const Mutations = {
             return user
         })
         return {...userExist, ...data} */
+        const userId = getUserId(request)
+        const { password } = data 
+        if(password){
+            data.password = await hashPassword(data.password)
+        }
         return prisma.users.update({
-            where: {id},
-            data,
+            where: {id: Number(id)},
+            data
         })
     },
-    createAuthor: async (parent,{data},{prisma, pubsub},info)=>{
+    createAuthor: async (parent,{data},{request,prisma, pubsub},info)=>{
         /* const author = {
             id: uuidv4(),
             ...data
         }
 
         db.authors.push(author) */
+        const userId = getUserId(request)
         const {register_by, ...rest} = data
         const newAuthor = await prisma.authors.create({
             data: {...rest, users:{
@@ -63,7 +95,7 @@ const Mutations = {
         })
         return newAuthor
     },
-    updateAuthor: async (parent,{id, data},{prisma, pubsub},info)=>{
+    updateAuthor: async (parent,{id, data},{request,prisma, pubsub},info)=>{
         /* const authorExist = db.authors.find(author=>author.id === id)
         if(!authorExist){
             throw new Error('Author not found')
@@ -78,9 +110,10 @@ const Mutations = {
         })
         
         const authorUpdated = {...authorExist, ...data} */
-        const {register_by} = data
+        const userId = getUserId(request)
+        const {register_by, ...rest} = data
         if(register_by){
-            data.users={
+            rest.users={
                 connect:{
                     id: Number(register_by)
                 }
@@ -90,7 +123,9 @@ const Mutations = {
             where: {
                 id: Number(id)
             },
-            data
+            data: {
+                ...rest
+            }
         })
         /* Subscription agregado */
         pubsub.publish('author',{
@@ -102,7 +137,7 @@ const Mutations = {
 
         return authorUpdated
     },
-    createBook: async (parent,{data},{prisma,pubsub},info)=>{
+    createBook: async (parent,{data},{request,prisma,pubsub},info)=>{
         /* const authorExists = db.authors.some(author => author.id === data.writted_by)
 
         if(!authorExists) {
@@ -115,15 +150,20 @@ const Mutations = {
         }
 
         db.books.push(book) */
+        const userId = getUserId(request)
         const {writted_by,register_by,...rest} = data
         const newBook = await prisma.books.create({
             data: {
                 ...rest,
                 authors: {
-                    connect: Number(writted_by)
+                    connect: {
+                        id: Number(writted_by)
+                    } ,
                 },
                 users: {
-                    connect: Number(register_by)
+                    connect: {
+                        id: Number(writted_by)
+                    } ,
                 },
             }
         })
@@ -137,7 +177,7 @@ const Mutations = {
 
         return newBook
     },
-    updateBook: async (parent,{id,data},{prisma, pubsub},info)=>{
+    updateBook: async (parent,{id,data},{request,prisma, pubsub},info)=>{
 
         /* const authorExists = db.authors.some(author => author.id === data.writted_by)
 
@@ -159,16 +199,17 @@ const Mutations = {
         })
 
         const bookUpdated = {...bookExist, ...data} */
-        const {writted_by, register_by} = data
+        const userId = getUserId(request)
+        const {writted_by, register_by, ...rest} = data
         if(writted_by){
-            data.authors={
+            rest.authors={
                 connect: {
                     id: Number(writted_by)
                 }
             }
         }
         if(register_by){
-            data.users={
+            rest.users={
                 connect: {
                     id: Number(register_by)
                 }
@@ -178,7 +219,9 @@ const Mutations = {
             where: {
                 id: Number(id)
             },
-            data
+            data: {
+                ...rest
+            }
         })
         /* Subscription agregado */
         pubsub.publish(`book - ${bookUpdated.writted_by}`,{
@@ -190,7 +233,7 @@ const Mutations = {
 
         return bookUpdated
     },
-    deleteBook: async (parent,{id},{prisma, pubsub},info)=>{
+    deleteBook: async (parent,{id},{request,prisma, pubsub},info)=>{
         /* const bookExist = db.books.find(book=>book.id === id)
         if(!bookExist){
             throw new Error('Book not found')
@@ -202,6 +245,7 @@ const Mutations = {
             }
             return acc
         }, []) */
+        const userId = getUserId(request)
         const bookDeleted = prisma.books.delete({
             where: {
                 id: Number(id)

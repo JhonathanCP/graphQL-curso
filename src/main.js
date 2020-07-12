@@ -28,7 +28,12 @@ const context = {
 const server = new GraphQLServer({
     typeDefs: './src/schema.graphql',
     resolvers,
-    context
+    context: request => {/* authentication */
+        return {
+            ...request,
+            ...context,
+        }
+    }
 })
 
 server.start(()=>console.log('Server is running on localhost:4000'))

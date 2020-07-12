@@ -1,3 +1,4 @@
+import { getUserId } from '../utils'
 const Subscription = {
     count: {
         subscribe(parent, args, {pubsub}, info){
@@ -12,12 +13,14 @@ const Subscription = {
         }
     },
     author: {
-        subscribe(parent, args, {pubsub}, info){
+        subscribe(parent, args, {request,pubsub}, info){
+            const userId = getUserId(request)
             return pubsub.asyncIterator('author')/* canal */
         }
     },
     book: {
-        subscribe(parent, {authorId}, {pubsub}, info){
+        subscribe(parent, {authorId}, {request,pubsub}, info){
+            const userId = getUserId(request)
             return pubsub.asyncIterator(`book - ${authorId}`)/* canal */
         }
     }
