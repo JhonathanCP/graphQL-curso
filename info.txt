@@ -108,3 +108,13 @@ agregar cambios al mutation.js
 cambiar signUp
 agregar login al schema y al mutations
 agregar validación a los queries y en los demás resolvers
+
+->DEPLOYMENT
+crear dockerfile
+FROM smartroadsense/postgres-cli:lastest
+
+COPY script.sql script.sql
+
+ENTRYPOINT psql -h ${DB_HOST} -d ${DB_NAME} -U ${DB_USER} -f script.sql
+
+modificar main.js
