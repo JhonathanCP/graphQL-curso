@@ -1,4 +1,4 @@
-FROM smartroadsense/postgres-cli
+FROM smartroadsense/postgres-cli:latest
 
 COPY script.sql script.sql
 
