@@ -1,4 +1,4 @@
-FROM finbourne/postgres-client:lastest
+FROM smartroadsense/postgres-cli
 
 COPY script.sql script.sql
 
