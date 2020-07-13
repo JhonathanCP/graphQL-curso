@@ -3,8 +3,8 @@ type Query {
     hello(name: String): String!
     quantity: Int!
     user(id: ID): [User!]!
-    author(id: ID): [Author!]!
-    book(id: ID): [Book!]!
+    author(id: ID, take: Int, skip: Int, orderBy: AuthorOrderByInput): [Author!]!
+    book(id: ID, take: Int, skip: Int, orderBy: BookOrderByInput): [Book!]!
 }
 
 type User {
@@ -130,4 +130,22 @@ input updateBookInput {
     price: Int
     writted_by: ID
     register_by: ID
+}
+
+input AuthorOrderByInput {
+    id: OrderByArg
+    name: OrderByArg
+    country: OrderByArg
+}
+
+input BookOrderByInput {
+    id: OrderByArg
+    title: OrderByArg
+    quantity: OrderByArg
+    price: OrderByArg
+}
+
+enum OrderByArg {
+    asc,
+    desc,
 }

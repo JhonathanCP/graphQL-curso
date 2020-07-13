@@ -21,10 +21,14 @@ const Query = {
             }
         })
     },
-    author: (parent, {id}, {request,prisma}, info) => {/* prisma agregado */
+    author: (parent, {id, take, skip, orderBy}, {request,prisma}, info) => {/* prisma agregado */
         const userId = getUserId(request)
         if(!id){
-            return prisma.authors.findMany()
+            return prisma.authors.findMany({/* pagination and sorting */
+                take,
+                skip,
+                orderBy,
+            })
         }
 
         return prisma.authors.findOne({
@@ -33,10 +37,14 @@ const Query = {
             }
         })
     },
-    book: (parent, {id}, {request,prisma}, info) => {/* prisma agregado */
+    book: (parent, {id, take, skip, orderBy}, {request,prisma}, info) => {/* prisma agregado */
         const userId = getUserId(request)
         if(!id){
-            return prisma.books.findMany()
+            return prisma.books.findMany({
+                take,
+                skip,
+                orderBy,
+            })
         }
 
         return prisma.books.findOne({

@@ -10,9 +10,7 @@ const Mutations = {
             id: uuidv4(),
             ...data
         }
-
         db.users.push(user)
-
         return user */
         const password = await hashPassword(data.password)
         const user = await prisma.users.create({
@@ -75,7 +73,6 @@ const Mutations = {
             id: uuidv4(),
             ...data
         }
-
         db.authors.push(author) */
         const userId = getUserId(request)
         const {register_by, ...rest} = data
@@ -139,16 +136,13 @@ const Mutations = {
     },
     createBook: async (parent,{data},{request,prisma,pubsub},info)=>{
         /* const authorExists = db.authors.some(author => author.id === data.writted_by)
-
         if(!authorExists) {
             throw new Error('Author does not exits')
         }
-
         const book = {
             id: uuidv4(),
             ...data
         }
-
         db.books.push(book) */
         const userId = getUserId(request)
         const {writted_by,register_by,...rest} = data
@@ -162,7 +156,7 @@ const Mutations = {
                 },
                 users: {
                     connect: {
-                        id: Number(writted_by)
+                        id: Number(register_by)
                     } ,
                 },
             }
@@ -180,11 +174,9 @@ const Mutations = {
     updateBook: async (parent,{id,data},{request,prisma, pubsub},info)=>{
 
         /* const authorExists = db.authors.some(author => author.id === data.writted_by)
-
         if(data.writted_by && !authorExists) {
             throw new Error('Author does not exits')
         }
-
         const bookExist = db.books.find(book=>book.id === id)
         if(!bookExist){
             throw new Error('Book not found')
@@ -197,7 +189,6 @@ const Mutations = {
             }
             return book
         })
-
         const bookUpdated = {...bookExist, ...data} */
         const userId = getUserId(request)
         const {writted_by, register_by, ...rest} = data
@@ -238,7 +229,6 @@ const Mutations = {
         if(!bookExist){
             throw new Error('Book not found')
         }
-
         db.books = db.books.reduce((acc, book)=>{
             if(book.id !== id){
                 acc.push(book)
