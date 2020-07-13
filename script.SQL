@@ -25,4 +25,5 @@ CREATE TABLE books (
     FOREIGN KEY (register_by) REFERENCES users (id)
 )
 
+
 ALTER TABLE users ADD COLUMN password VARCHAR
